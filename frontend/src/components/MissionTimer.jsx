@@ -7,13 +7,13 @@ const TimerContainer = styled.div`
   align-items: center;
   justify-content: center;
   min-height: 60vh;
-  gap: ${props => props.theme.spacing.xxl};
+  gap: 48px;
 `
 
 const MissionTitle = styled.h2`
-  font-size: ${props => props.theme.fontSizes.xxxl};
-  font-weight: ${props => props.theme.fontWeights.bold};
-  color: ${props => props.theme.colors.text};
+  font-size: 32px;
+  font-weight: 700;
+  color: #333333;
   text-align: center;
 `
 
@@ -21,11 +21,11 @@ const TimerDisplay = styled.div`
   width: 300px;
   height: 300px;
   border-radius: 50%;
-  background: linear-gradient(135deg, ${props => props.theme.colors.primary} 0%, #5a52d5 100%);
+  background: linear-gradient(135deg, #6C63FF 0%, #5a52d5 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: ${props => props.theme.shadows.xl};
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
   position: relative;
 
   &::before {
@@ -34,21 +34,21 @@ const TimerDisplay = styled.div`
     width: 280px;
     height: 280px;
     border-radius: 50%;
-    background-color: ${props => props.theme.colors.surface};
+    background-color: #FFFFFF;
   }
 `
 
 const Time = styled.div`
   font-size: 4rem;
-  font-weight: ${props => props.theme.fontWeights.bold};
-  color: ${props => props.theme.colors.text};
+  font-weight: 700;
+  color: #333333;
   z-index: 1;
   font-variant-numeric: tabular-nums;
 `
 
 const MissionDescription = styled.p`
-  font-size: ${props => props.theme.fontSizes.lg};
-  color: ${props => props.theme.colors.textSecondary};
+  font-size: 18px;
+  color: #757575;
   text-align: center;
   max-width: 500px;
   line-height: 1.6;
@@ -56,34 +56,34 @@ const MissionDescription = styled.p`
 
 const ButtonGroup = styled.div`
   display: flex;
-  gap: ${props => props.theme.spacing.lg};
+  gap: 24px;
 `
 
 const Button = styled.button`
-  padding: ${props => props.theme.spacing.md} ${props => props.theme.spacing.xxl};
-  border-radius: ${props => props.theme.borderRadius.lg};
-  font-size: ${props => props.theme.fontSizes.lg};
-  font-weight: ${props => props.theme.fontWeights.semiBold};
-  transition: all ${props => props.theme.transitions.fast};
+  padding: 16px 48px;
+  border-radius: 12px;
+  font-size: 18px;
+  font-weight: 600;
+  transition: all 0.15s ease;
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: ${props => props.theme.shadows.md};
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   }
 `
 
 const CancelButton = styled(Button)`
-  background-color: ${props => props.theme.colors.surface};
-  color: ${props => props.theme.colors.text};
-  border: 2px solid ${props => props.theme.colors.border};
+  background-color: #FFFFFF;
+  color: #333333;
+  border: 2px solid #E0E0E0;
 
   &:hover {
-    border-color: ${props => props.theme.colors.textSecondary};
+    border-color: #757575;
   }
 `
 
 const CompleteButton = styled(Button)`
-  background-color: ${props => props.theme.colors.success};
+  background-color: #4CAF50;
   color: white;
 
   &:hover {
@@ -102,23 +102,23 @@ const FocusAlert = styled.div`
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-color: ${props => props.theme.colors.surface};
-  padding: ${props => props.theme.spacing.xxl};
-  border-radius: ${props => props.theme.borderRadius.xl};
-  box-shadow: ${props => props.theme.shadows.xl};
+  background-color: #FFFFFF;
+  padding: 48px;
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
   text-align: center;
   z-index: 1000;
   display: ${props => props.show ? 'block' : 'none'};
 
   h3 {
-    font-size: ${props => props.theme.fontSizes.xxl};
-    color: ${props => props.theme.colors.primary};
-    margin-bottom: ${props => props.theme.spacing.md};
+    font-size: 24px;
+    color: #6C63FF;
+    margin-bottom: 16px;
   }
 
   p {
-    font-size: ${props => props.theme.fontSizes.lg};
-    color: ${props => props.theme.colors.textSecondary};
+    font-size: 18px;
+    color: #757575;
   }
 `
 

@@ -9,7 +9,7 @@ const NavContainer = styled.nav`
   bottom: 0;
   left: 0;
   right: 0;
-  background-color: ${props => props.theme.colors.surface};
+  background-color: #FFFFFF;
   box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
   z-index: 1000;
   padding-bottom: env(safe-area-inset-bottom);
@@ -20,7 +20,7 @@ const NavContent = styled.div`
   margin: 0 auto;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  padding: ${props => props.theme.spacing.xs} 0;
+  padding: 4px 0;
 `
 
 const StyledNavLink = styled(NavLink)`
@@ -28,13 +28,13 @@ const StyledNavLink = styled(NavLink)`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: ${props => props.theme.spacing.sm};
-  color: ${props => props.theme.colors.textSecondary};
-  transition: all ${props => props.theme.transitions.fast};
+  padding: 8px;
+  color: #757575;
+  transition: all 0.15s ease;
   text-decoration: none;
 
   &.active {
-    color: ${props => props.theme.colors.primary};
+    color: #6C63FF;
 
     .nav-icon {
       transform: scale(1.1);
@@ -48,13 +48,13 @@ const StyledNavLink = styled(NavLink)`
 
 const NavIcon = styled.div`
   font-size: 1.5rem;
-  margin-bottom: ${props => props.theme.spacing.xs};
-  transition: transform ${props => props.theme.transitions.fast};
+  margin-bottom: 4px;
+  transition: transform 0.15s ease;
 `
 
 const NavLabel = styled.span`
-  font-size: ${props => props.theme.fontSizes.xs};
-  font-weight: ${props => props.theme.fontWeights.medium};
+  font-size: 12px;
+  font-weight: 500;
 `
 
 const navItems = [

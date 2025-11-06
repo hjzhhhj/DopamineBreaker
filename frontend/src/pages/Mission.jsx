@@ -5,35 +5,35 @@ import MissionTimer from '../components/MissionTimer'
 const MissionContainer = styled.div`
   max-width: 480px;
   margin: 0 auto;
-  padding: ${props => props.theme.spacing.lg};
+  padding: 24px;
   padding-bottom: 100px;
 `
 
 const PageTitle = styled.h1`
-  font-size: ${props => props.theme.fontSizes.xxl};
-  font-weight: ${props => props.theme.fontWeights.bold};
-  color: ${props => props.theme.colors.text};
-  margin-bottom: ${props => props.theme.spacing.xl};
+  font-size: 24px;
+  font-weight: 700;
+  color: #333333;
+  margin-bottom: 32px;
 `
 
 const ToggleContainer = styled.div`
   display: flex;
-  background-color: ${props => props.theme.colors.surface};
-  border-radius: ${props => props.theme.borderRadius.xl};
-  padding: ${props => props.theme.spacing.xs};
-  margin-bottom: ${props => props.theme.spacing.xl};
-  box-shadow: ${props => props.theme.shadows.sm};
+  background-color: #FFFFFF;
+  border-radius: 16px;
+  padding: 4px;
+  margin-bottom: 32px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
 `
 
 const ToggleButton = styled.button`
   flex: 1;
-  padding: ${props => props.theme.spacing.md};
-  border-radius: ${props => props.theme.borderRadius.lg};
-  font-weight: ${props => props.theme.fontWeights.semiBold};
-  font-size: ${props => props.theme.fontSizes.sm};
-  transition: all ${props => props.theme.transitions.fast};
+  padding: 16px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.15s ease;
   background-color: ${props => props.active ? props.bgColor : 'transparent'};
-  color: ${props => props.active ? 'white' : props.theme.colors.textSecondary};
+  color: ${props => props.active ? 'white' : '#757575'};
 
   &:hover {
     opacity: 0.8;
@@ -43,17 +43,17 @@ const ToggleButton = styled.button`
 const MissionList = styled.div`
   display: flex;
   flex-direction: column;
-  gap: ${props => props.theme.spacing.md};
+  gap: 16px;
 `
 
 const MissionCard = styled.div`
-  background-color: ${props => props.theme.colors.surface};
-  border-radius: ${props => props.theme.borderRadius.lg};
-  padding: ${props => props.theme.spacing.lg};
-  box-shadow: ${props => props.theme.shadows.sm};
+  background-color: #FFFFFF;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
   border-left: 4px solid ${props => props.tierColor};
   cursor: pointer;
-  transition: all ${props => props.theme.transitions.fast};
+  transition: all 0.15s ease;
 
   &:active {
     transform: scale(0.98);
@@ -64,7 +64,7 @@ const MissionHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: start;
-  margin-bottom: ${props => props.theme.spacing.sm};
+  margin-bottom: 8px;
 `
 
 const MissionTitleSection = styled.div`
@@ -72,38 +72,38 @@ const MissionTitleSection = styled.div`
 `
 
 const MissionTitle = styled.h3`
-  font-size: ${props => props.theme.fontSizes.lg};
-  font-weight: ${props => props.theme.fontWeights.semiBold};
-  color: ${props => props.theme.colors.text};
-  margin-bottom: ${props => props.theme.spacing.xs};
+  font-size: 18px;
+  font-weight: 600;
+  color: #333333;
+  margin-bottom: 4px;
 `
 
 const MissionBadge = styled.span`
   display: inline-block;
-  padding: ${props => props.theme.spacing.xs} ${props => props.theme.spacing.sm};
-  border-radius: ${props => props.theme.borderRadius.sm};
-  font-size: ${props => props.theme.fontSizes.xs};
-  font-weight: ${props => props.theme.fontWeights.medium};
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
   background-color: ${props => props.tierColor}20;
   color: ${props => props.tierColor};
 `
 
 const MissionDuration = styled.div`
-  font-size: ${props => props.theme.fontSizes.xxl};
-  font-weight: ${props => props.theme.fontWeights.bold};
+  font-size: 24px;
+  font-weight: 700;
   color: ${props => props.tierColor};
 `
 
 const MissionDescription = styled.p`
-  font-size: ${props => props.theme.fontSizes.sm};
-  color: ${props => props.theme.colors.textSecondary};
+  font-size: 14px;
+  color: #757575;
   line-height: 1.5;
 `
 
 const EmptyState = styled.div`
   text-align: center;
-  padding: ${props => props.theme.spacing.xxl};
-  color: ${props => props.theme.colors.textSecondary};
+  padding: 48px;
+  color: #757575;
 `
 
 const missions = [

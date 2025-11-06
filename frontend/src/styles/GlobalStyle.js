@@ -9,10 +9,10 @@ const GlobalStyle = createGlobalStyle`
 
   html, body {
     height: 100%;
-    font-family: ${props => props.theme.fonts.main};
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     font-size: 16px;
-    color: ${props => props.theme.colors.text};
-    background-color: ${props => props.theme.colors.background};
+    color: #333333;
+    background-color: #F8F9FA;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -58,16 +58,16 @@ const GlobalStyle = createGlobalStyle`
   }
 
   ::-webkit-scrollbar-track {
-    background: ${props => props.theme.colors.background};
+    background: #F8F9FA;
   }
 
   ::-webkit-scrollbar-thumb {
-    background: ${props => props.theme.colors.border};
+    background: #E0E0E0;
     border-radius: 4px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: ${props => props.theme.colors.textSecondary};
+    background: #757575;
   }
 `
 

@@ -4,14 +4,14 @@ import styled from 'styled-components'
 const ProfileContainer = styled.div`
   max-width: 480px;
   margin: 0 auto;
-  padding: ${props => props.theme.spacing.lg};
+  padding: 24px;
   padding-bottom: 100px;
 `
 
 const ProfileHeader = styled.div`
   text-align: center;
-  padding: ${props => props.theme.spacing.xl} 0;
-  margin-bottom: ${props => props.theme.spacing.xl};
+  padding: 32px 0;
+  margin-bottom: 32px;
 `
 
 const Avatar = styled.div`
@@ -23,55 +23,55 @@ const Avatar = styled.div`
   align-items: center;
   justify-content: center;
   font-size: 2rem;
-  margin: 0 auto ${props => props.theme.spacing.md};
+  margin: 0 auto 16px;
 `
 
 const UserName = styled.h1`
-  font-size: ${props => props.theme.fontSizes.xxl};
-  font-weight: ${props => props.theme.fontWeights.bold};
-  color: ${props => props.theme.colors.text};
+  font-size: 24px;
+  font-weight: 700;
+  color: #333333;
 `
 
 const MedalSection = styled.section`
-  margin-bottom: ${props => props.theme.spacing.xxl};
+  margin-bottom: 48px;
 `
 
 const SectionTitle = styled.h2`
-  font-size: ${props => props.theme.fontSizes.lg};
-  font-weight: ${props => props.theme.fontWeights.semiBold};
-  color: ${props => props.theme.colors.text};
-  margin-bottom: ${props => props.theme.spacing.md};
+  font-size: 18px;
+  font-weight: 600;
+  color: #333333;
+  margin-bottom: 16px;
 `
 
 const MedalGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: ${props => props.theme.spacing.md};
+  gap: 16px;
 `
 
 const MedalCard = styled.div`
-  background-color: ${props => props.theme.colors.surface};
-  border-radius: ${props => props.theme.borderRadius.lg};
-  padding: ${props => props.theme.spacing.lg};
-  box-shadow: ${props => props.theme.shadows.sm};
+  background-color: #FFFFFF;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
   text-align: center;
 `
 
 const MedalIcon = styled.div`
   font-size: 2.5rem;
-  margin-bottom: ${props => props.theme.spacing.sm};
+  margin-bottom: 8px;
 `
 
 const MedalCount = styled.div`
-  font-size: ${props => props.theme.fontSizes.xl};
-  font-weight: ${props => props.theme.fontWeights.bold};
+  font-size: 20px;
+  font-weight: 700;
   color: ${props => props.medalColor};
-  margin-bottom: ${props => props.theme.spacing.xs};
+  margin-bottom: 4px;
 `
 
 const MedalLabel = styled.div`
-  font-size: ${props => props.theme.fontSizes.xs};
-  color: ${props => props.theme.colors.textSecondary};
+  font-size: 12px;
+  color: #757575;
 `
 
 const RecentMissions = styled.section``
@@ -79,14 +79,14 @@ const RecentMissions = styled.section``
 const MissionList = styled.div`
   display: flex;
   flex-direction: column;
-  gap: ${props => props.theme.spacing.md};
+  gap: 16px;
 `
 
 const MissionItem = styled.div`
-  background-color: ${props => props.theme.colors.surface};
-  border-radius: ${props => props.theme.borderRadius.lg};
-  padding: ${props => props.theme.spacing.md};
-  box-shadow: ${props => props.theme.shadows.sm};
+  background-color: #FFFFFF;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -97,24 +97,24 @@ const MissionInfo = styled.div`
 `
 
 const MissionTitle = styled.div`
-  font-size: ${props => props.theme.fontSizes.md};
-  font-weight: ${props => props.theme.fontWeights.medium};
-  color: ${props => props.theme.colors.text};
-  margin-bottom: ${props => props.theme.spacing.xs};
+  font-size: 16px;
+  font-weight: 500;
+  color: #333333;
+  margin-bottom: 4px;
 `
 
 const MissionDate = styled.div`
-  font-size: ${props => props.theme.fontSizes.sm};
-  color: ${props => props.theme.colors.textSecondary};
+  font-size: 14px;
+  color: #757575;
 `
 
 const MissionBadge = styled.div`
-  padding: ${props => props.theme.spacing.xs} ${props => props.theme.spacing.md};
-  border-radius: ${props => props.theme.borderRadius.md};
+  padding: 4px 16px;
+  border-radius: 8px;
   background-color: ${props => props.tierColor}20;
   color: ${props => props.tierColor};
-  font-size: ${props => props.theme.fontSizes.sm};
-  font-weight: ${props => props.theme.fontWeights.medium};
+  font-size: 14px;
+  font-weight: 500;
 `
 
 const tierConfig = {
