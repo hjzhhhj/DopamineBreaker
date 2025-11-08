@@ -9,7 +9,7 @@ const HomeContainer = styled.div`
   max-width: 480px;
   margin: 0 auto;
   padding: 24px;
-  padding-bottom: 100px;
+  padding-bottom: 24px;
 `;
 
 const Header = styled.div`
@@ -101,51 +101,66 @@ const BarLabel = styled.div`
 
 const MissionGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
-
-  @media (max-width: 480px) {
-    grid-template-columns: 1fr;
-  }
+  background-color: #ffffff;
+  border-radius: 16px;
+  max-width: 480px;
 `;
 
 const MissionCardSmall = styled.div`
   background-color: #ffffff;
-  padding: 20px;
   border-radius: 12px;
+  padding: 24px;
   cursor: pointer;
-  transition: transform 0.15s ease;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.15s ease;
 
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  &:active {
+    transform: scale(0.98);
   }
 `;
 
-const MedalIcon = styled.img`
-  width: 36px;
-  height: 36px;
-  object-fit: contain;
+const MissionHeader = styled.div`
+  display: flex;
+  gap: 16px;
 `;
 
-const MissionInfo = styled.div`
+const MissionTitleSection = styled.div`
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
   flex: 1;
 `;
 
-const MissionTitle = styled.div`
-  font-size: 15px;
-  font-weight: 600;
+const MissionContent = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+`;
+
+const MissionBadge = styled.span`
+  display: inline-block;
+  font-size: 14px;
+  font-weight: 700;
   color: #333333;
-  margin-bottom: 4px;
+  width: fit-content;
 `;
 
 const MissionDuration = styled.div`
-  font-size: 13px;
+  font-size: 0.85rem;
+  font-weight: 450;
+  white-space: nowrap;
   color: #757575;
+`;
+
+const MissionDescription = styled.p`
+  font-size: 14.6px;
+  color: #757575;
+`;
+
+const MedalIcon = styled.img`
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
 `;
 
 const API_BASE_URL =
@@ -255,13 +270,23 @@ function Home() {
                 key={mission.id}
                 onClick={() => handleMissionClick(mission)}
               >
-                {tierMeta?.medal && (
-                  <MedalIcon src={tierMeta.medal} alt={`${tierMeta.label} 메달`} />
-                )}
-                <MissionInfo>
-                  <MissionTitle>{mission.title || mission.description}</MissionTitle>
+                <MissionHeader>
+                  <MissionTitleSection>
+                    {tierMeta?.medal && (
+                      <MedalIcon
+                        src={tierMeta.medal}
+                        alt={`${tierMeta.label} 메달`}
+                      />
+                    )}
+                    <MissionContent>
+                      <MissionBadge>{tierMeta?.label} 메달 미션</MissionBadge>
+                      <MissionDescription>
+                        {mission.description}
+                      </MissionDescription>
+                    </MissionContent>
+                  </MissionTitleSection>
                   <MissionDuration>{mission.duration}분</MissionDuration>
-                </MissionInfo>
+                </MissionHeader>
               </MissionCardSmall>
             );
           })}
