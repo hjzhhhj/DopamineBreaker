@@ -2,7 +2,7 @@ from flask import request, jsonify, Blueprint, current_app
 from models.user import UserModel
 from database import db
 from extensions import bcrypt
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 import datetime
 
 auth_bp = Blueprint('auth', __name__)
@@ -86,3 +86,27 @@ def login():
     except Exception as e:
         current_app.logger.error(f'로그인 중 오류 발생: {str(e)}', exc_info=True)
         return jsonify({'message': '로그인 중 오류가 발생했습니다.', 'error': str(e)}), 500
+
+@auth_bp.route('/me', methods=['GET'])
+@jwt_required()
+def get_current_user():
+    """현재 로그인한 사용자 정보 조회"""
+    try:
+        user_id = get_jwt_identity()
+        user = UserModel.query.get(user_id)
+
+        if not user:
+            current_app.logger.warning(f'사용자를 찾을 수 없음: user_id={user_id}')
+            return jsonify({'message': '사용자를 찾을 수 없습니다.'}), 404
+
+        current_app.logger.info(f'사용자 정보 조회: user_id={user_id}, username={user.username}')
+        return jsonify({
+            'id': user.id,
+            'username': user.username,
+            'email': user.email,
+            'created_at': user.created_at.isoformat() if user.created_at else None
+        }), 200
+
+    except Exception as e:
+        current_app.logger.error(f'사용자 정보 조회 중 오류 발생: {str(e)}', exc_info=True)
+        return jsonify({'message': '사용자 정보 조회 중 오류가 발생했습니다.', 'error': str(e)}), 500

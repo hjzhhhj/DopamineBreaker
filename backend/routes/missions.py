@@ -4,6 +4,7 @@ from database import db
 from models.mission import Mission, MissionRecord
 from models.daily_mission import DailyMission
 from utils.mission_presets import get_mission_presets
+from flask_jwt_extended import jwt_required, get_jwt_identity, verify_jwt_in_request
 
 missions_bp = Blueprint('missions', __name__)
 
@@ -107,7 +108,16 @@ def complete_preset_mission():
     if not data or 'preset_mission_id' not in data:
         return jsonify({'error': 'preset_mission_id is required'}), 400
 
+    # JWT 토큰이 있으면 user_id 추출 (선택적)
+    user_id = None
+    try:
+        verify_jwt_in_request(optional=True)
+        user_id = get_jwt_identity()
+    except:
+        pass
+
     record = MissionRecord(
+        user_id=user_id,
         preset_mission_id=data['preset_mission_id'],
         tier=data.get('tier'),
         title=data.get('title'),
@@ -127,10 +137,21 @@ def complete_preset_mission():
 
 @missions_bp.route('/medals', methods=['GET'])
 def get_earned_medals():
-    """획득한 메달 조회"""
-    records = MissionRecord.query.filter(
-        MissionRecord.tier.isnot(None)
-    ).all()
+    """획득한 메달 조회 (로그인한 사용자 전용)"""
+    # JWT 토큰이 있으면 해당 사용자의 메달만 조회, 없으면 전체 조회
+    user_id = None
+    try:
+        verify_jwt_in_request(optional=True)
+        user_id = get_jwt_identity()
+    except:
+        pass
+
+    query = MissionRecord.query.filter(MissionRecord.tier.isnot(None))
+
+    if user_id:
+        query = query.filter(MissionRecord.user_id == user_id)
+
+    records = query.all()
 
     medals = {'bronze': 0, 'silver': 0, 'gold': 0}
     for record in records:
@@ -142,14 +163,23 @@ def get_earned_medals():
 
 @missions_bp.route('/recent', methods=['GET'])
 def get_recent_completed_missions():
-    """최근 클리어한 미션 조회"""
+    """최근 클리어한 미션 조회 (로그인한 사용자 전용)"""
     limit = request.args.get('limit', 5, type=int)
 
-    records = MissionRecord.query\
-        .filter(MissionRecord.preset_mission_id.isnot(None))\
-        .order_by(MissionRecord.completed_at.desc())\
-        .limit(limit)\
-        .all()
+    # JWT 토큰이 있으면 해당 사용자의 미션만 조회, 없으면 전체 조회
+    user_id = None
+    try:
+        verify_jwt_in_request(optional=True)
+        user_id = get_jwt_identity()
+    except:
+        pass
+
+    query = MissionRecord.query.filter(MissionRecord.preset_mission_id.isnot(None))
+
+    if user_id:
+        query = query.filter(MissionRecord.user_id == user_id)
+
+    records = query.order_by(MissionRecord.completed_at.desc()).limit(limit).all()
 
     return jsonify({
         'missions': [record.to_dict() for record in records]

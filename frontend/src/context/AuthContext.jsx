@@ -12,13 +12,29 @@ export const AuthProvider = ({ children }) => {
 
   // 앱 시작/새로고침 시 토큰 있으면 axios 헤더 세팅 + user 복원
   useEffect(() => {
-    if (token) {
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      // 실제로는 /api/auth/me 같은 API에서 유저 정보를 다시 가져오는 게 좋지만
-      // 지금은 간단하게 로그인됨 상태만 표시
-      setUser({ isAuthenticated: true });
-    }
-    setLoading(false);
+    const fetchUserInfo = async () => {
+      if (token) {
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        try {
+          // 서버에서 현재 로그인한 사용자 정보 가져오기
+          const response = await axios.get(`${API_URL}/auth/me`);
+          setUser({
+            isAuthenticated: true,
+            ...response.data
+          });
+        } catch (error) {
+          console.error('사용자 정보를 불러오는데 실패했습니다:', error);
+          // 토큰이 만료되었거나 잘못된 경우 로그아웃 처리
+          localStorage.removeItem('token');
+          setToken(null);
+          delete axios.defaults.headers.common['Authorization'];
+          setUser(null);
+        }
+      }
+      setLoading(false);
+    };
+
+    fetchUserInfo();
   }, [token]);
 
   // 로그인
@@ -40,8 +56,17 @@ export const AuthProvider = ({ children }) => {
       setToken(access_token);
       axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
 
-      // 간단한 사용자 정보 저장 (필요하면 확장 가능)
-      setUser({ isAuthenticated: true, username });
+      // 사용자 정보 가져오기
+      try {
+        const userResponse = await axios.get(`${API_URL}/auth/me`);
+        setUser({
+          isAuthenticated: true,
+          ...userResponse.data
+        });
+      } catch (err) {
+        console.error('사용자 정보를 불러오는데 실패했습니다:', err);
+        setUser({ isAuthenticated: true, username });
+      }
 
       return { ok: true };
     } catch (error) {

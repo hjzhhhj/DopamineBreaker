@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import styled from "styled-components";
+import { useAuth } from "../context/AuthContext";
 import ProfileImg from "../assets/Profile.png";
 import DongMedal from "../assets/DongMedal.png";
 import EunMedal from "../assets/EunMedal.png";
@@ -177,8 +178,7 @@ const tierConfig = {
 };
 
 function Profile() {
-  const [userName] = useState("사용자");
-  const [userId] = useState("@user1234");
+  const { user } = useAuth();
   const [medalStats, setMedalStats] = useState({
     bronze: 0,
     silver: 0,
@@ -186,18 +186,26 @@ function Profile() {
   });
   const [recentMissions, setRecentMissions] = useState([]);
 
+  // 사용자 정보 기본값 설정
+  const userName = user?.username || "사용자";
+  const userId = user?.email || "@user";
+
   useEffect(() => {
     const fetchMedals = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/missions/medals`);
+        const response = await fetch(`${API_BASE_URL}/missions/medals`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
         const data = await response.json();
         setMedalStats(data.medals);
       } catch (error) {
         console.error("메달 정보를 불러오지 못했습니다:", error);
-        // 임시 데이터 사용
+        // 오류 시 0으로 초기화
         setMedalStats({
-          bronze: 12,
-          silver: 5,
+          bronze: 0,
+          silver: 0,
           gold: 0,
         });
       }
@@ -205,38 +213,25 @@ function Profile() {
 
     const fetchRecentMissions = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/missions/recent?limit=5`);
+        const response = await fetch(`${API_BASE_URL}/missions/recent?limit=5`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
         const data = await response.json();
         setRecentMissions(data.missions);
       } catch (error) {
         console.error("최근 미션을 불러오지 못했습니다:", error);
-        // 임시 데이터 사용
-        setRecentMissions([
-          {
-            id: 1,
-            title: "스트레칭 타임",
-            description: "간단한 목과 어깨 스트레칭으로 긴장을 풀어보세요",
-            tier: "bronze",
-          },
-          {
-            id: 2,
-            title: "심호흡 명상",
-            description: "깊은 호흡으로 마음을 안정시켜보세요",
-            tier: "bronze",
-          },
-          {
-            id: 3,
-            title: "독서 시간",
-            description: "좋아하는 책을 읽으며 휴식을 취해보세요",
-            tier: "silver",
-          },
-        ]);
+        setRecentMissions([]);
       }
     };
 
-    fetchMedals();
-    fetchRecentMissions();
-  }, []);
+    // 사용자 정보가 로드된 후에만 데이터 가져오기
+    if (user) {
+      fetchMedals();
+      fetchRecentMissions();
+    }
+  }, [user]);
 
   return (
     <ProfileContainer>
@@ -268,18 +263,24 @@ function Profile() {
         <RecentMissions>
           <SectionTitle>최근 클리어한 미션</SectionTitle>
           <MissionList>
-            {recentMissions.map((mission) => (
-              <MissionItem key={mission.id}>
-                <MissionMedalIcon
-                  src={tierConfig[mission.tier].medal}
-                  alt={tierConfig[mission.tier].label}
-                />
-                <MissionContent>
-                  <MissionTitle>{mission.title}</MissionTitle>
-                  <MissionDescription>{mission.description}</MissionDescription>
-                </MissionContent>
-              </MissionItem>
-            ))}
+            {recentMissions.length > 0 ? (
+              recentMissions.map((mission) => (
+                <MissionItem key={mission.id}>
+                  <MissionMedalIcon
+                    src={tierConfig[mission.tier]?.medal || DongMedal}
+                    alt={tierConfig[mission.tier]?.label || '메달'}
+                  />
+                  <MissionContent>
+                    <MissionTitle>{mission.title}</MissionTitle>
+                    <MissionDescription>{mission.description}</MissionDescription>
+                  </MissionContent>
+                </MissionItem>
+              ))
+            ) : (
+              <MissionDescription style={{ textAlign: 'center', padding: '20px' }}>
+                아직 클리어한 미션이 없습니다.
+              </MissionDescription>
+            )}
           </MissionList>
         </RecentMissions>
       </Section>

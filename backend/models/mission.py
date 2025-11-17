@@ -34,6 +34,7 @@ class MissionRecord(db.Model):
     __tablename__ = 'mission_records'
 
     id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)  # 사용자 ID
     mission_id = db.Column(db.Integer, db.ForeignKey('missions.id'), nullable=True)
     preset_mission_id = db.Column(db.Integer, nullable=True)  # 프리셋 미션 ID
     tier = db.Column(db.String(20), nullable=True)  # bronze, silver, gold
