@@ -1,15 +1,11 @@
 from flask import Flask, request
 from flask_cors import CORS
-from flask_bcrypt import Bcrypt
-from flask_jwt_extended import JWTManager
 from config import DevelopmentConfig
 from database import db
+from extensions import bcrypt, jwt
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 import atexit
-
-bcrypt = Bcrypt()
-jwt = JWTManager()
 
 def create_app(config_class=DevelopmentConfig):
     app = Flask(__name__)
