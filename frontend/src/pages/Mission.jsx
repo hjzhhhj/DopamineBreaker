@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import styled from "styled-components";
 import MissionTimer from "../components/MissionTimer";
-import DongMedal from "../assets/DongMedal.png";
-import EunMedal from "../assets/EunMedal.png";
-import GeumMedal from "../assets/GeumMedal.png";
 import MisionSuccess from "../assets/MisionSuccess.png";
+import { TIER_CONFIG } from "../constants";
+import { getTierMeta, getMissionTitle } from "../utils/helpers";
+import { missionApi } from "../services/api";
 
 const MissionContainer = styled.div`
   max-width: 480px;
@@ -194,18 +194,6 @@ const SuccessButton = styled.button`
   }
 `;
 
-const tierConfig = {
-  all: { label: "전체", medal: null, color: "#333333" },
-  bronze: { label: "브론즈", medal: DongMedal, color: "#cd7f32" },
-  silver: { label: "실버", medal: EunMedal, color: "#b0b0b0" },
-  gold: { label: "골드", medal: GeumMedal, color: "#d4af37" },
-};
-
-const API_BASE_URL = "/api"; // Vite proxy 사용
-
-const getTierMeta = (tier) => tierConfig[tier] || tierConfig.all;
-const getMissionTitle = (mission) =>
-  mission?.title || mission?.description || "미션";
 
 function Mission() {
   const location = useLocation();
@@ -224,19 +212,8 @@ function Mission() {
       setIsLoading(true);
       setError(null);
       try {
-        const response = await fetch(`${API_BASE_URL}/missions/presets`, {
-          signal: controller.signal,
-        });
-
-        if (!response.ok) {
-          throw new Error(
-            "미션을 불러오지 못했어요. 잠시 후 다시 시도해주세요."
-          );
-        }
-
-        const payload = await response.json();
-        const data = Array.isArray(payload) ? payload : payload.missions;
-        setMissions(Array.isArray(data) ? data : []);
+        const data = await missionApi.getPresets();
+        setMissions(data);
       } catch (err) {
         if (err.name !== "AbortError") {
           setError(err.message || "알 수 없는 오류가 발생했어요.");
@@ -270,28 +247,7 @@ function Mission() {
 
   const handleCompleteMission = async () => {
     try {
-      // API로 미션 완료 기록 전송
-      const response = await fetch(
-        `${API_BASE_URL}/missions/presets/complete`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            preset_mission_id: activeMission.id,
-            tier: activeMission.tier,
-            title: activeMission.title || activeMission.description,
-            description: activeMission.description,
-            duration: activeMission.duration,
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("미션 완료 기록에 실패했습니다.");
-      }
-
+      await missionApi.complete(activeMission);
       setCompletedMission(activeMission);
       setActiveMission(null);
       setShowSuccessModal(true);
@@ -306,54 +262,28 @@ function Mission() {
 
   const handleCancelMission = async () => {
     try {
-      // 미션 실패/취소 기록
-      await fetch(`${API_BASE_URL}/missions/presets/fail`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          preset_mission_id: activeMission.id,
-          tier: activeMission.tier,
-          title: activeMission.title || activeMission.description,
-          description: activeMission.description,
-        }),
-      });
+      await missionApi.fail(activeMission);
     } catch (error) {
       console.error("미션 실패 기록 중 오류:", error);
     } finally {
-      // 오류 여부와 관계없이 미션 취소
       setActiveMission(null);
+      await refreshMissions();
+    }
+  };
 
-      // 미션 목록 새로고침 (실패한 미션 제거)
-      try {
-        const response = await fetch(`${API_BASE_URL}/missions/presets`);
-        if (response.ok) {
-          const payload = await response.json();
-          const data = Array.isArray(payload) ? payload : payload.missions;
-          setMissions(Array.isArray(data) ? data : []);
-        }
-      } catch (error) {
-        console.error("미션 목록 새로고침 실패:", error);
-      }
+  const refreshMissions = async () => {
+    try {
+      const data = await missionApi.getPresets();
+      setMissions(data);
+    } catch (error) {
+      console.error("미션 목록 새로고침 실패:", error);
     }
   };
 
   const handleCloseSuccessModal = async () => {
     setShowSuccessModal(false);
     setCompletedMission(null);
-
-    // 완료된 미션이 목록에서 사라지도록 미션 목록 다시 불러오기
-    try {
-      const response = await fetch(`${API_BASE_URL}/missions/presets`);
-      if (response.ok) {
-        const payload = await response.json();
-        const data = Array.isArray(payload) ? payload : payload.missions;
-        setMissions(Array.isArray(data) ? data : []);
-      }
-    } catch (error) {
-      console.error("미션 목록 새로고침 실패:", error);
-    }
+    await refreshMissions();
   };
 
   if (activeMission) {
@@ -372,7 +302,7 @@ function Mission() {
         <PageTitle>오늘의 미션</PageTitle>
 
         <ToggleContainer>
-          {Object.entries(tierConfig).map(([tier, config]) => (
+          {Object.entries(TIER_CONFIG).map(([tier, config]) => (
             <ToggleButton
               key={tier}
               $active={selectedTier === tier}

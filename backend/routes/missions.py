@@ -4,7 +4,8 @@ from database import db
 from models.mission import Mission, MissionRecord
 from models.daily_mission import DailyMission
 from utils.mission_presets import get_mission_presets
-from flask_jwt_extended import jwt_required, get_jwt_identity, verify_jwt_in_request
+from utils.auth_helpers import get_current_user_id
+from utils.error_handlers import handle_db_errors, validate_json_payload, success_response, error_response
 
 missions_bp = Blueprint('missions', __name__)
 
@@ -90,20 +91,11 @@ def get_mission_records():
     }), 200
 
 @missions_bp.route('/presets/complete', methods=['POST'])
+@validate_json_payload(['preset_mission_id'])
+@handle_db_errors
 def complete_preset_mission():
     data = request.get_json()
-
-    if not data or 'preset_mission_id' not in data:
-        return jsonify({'error': 'preset_mission_id is required'}), 400
-
-    user_id = None
-    try:
-        verify_jwt_in_request(optional=True)
-        identity = get_jwt_identity()
-        if identity:
-            user_id = int(identity)
-    except:
-        pass
+    user_id = get_current_user_id()
 
     record = MissionRecord(
         user_id=user_id,
@@ -115,31 +107,18 @@ def complete_preset_mission():
         notes=data.get('notes')
     )
 
-    try:
-        db.session.add(record)
-        db.session.commit()
-        return jsonify(record.to_dict()), 201
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({'error': str(e)}), 500
+    db.session.add(record)
+    db.session.commit()
+    return success_response(record.to_dict(), status=201)
 
 
 @missions_bp.route('/presets/fail', methods=['POST'])
+@validate_json_payload(['preset_mission_id'])
+@handle_db_errors
 def fail_preset_mission():
     """미션 실패/취소 기록"""
     data = request.get_json()
-
-    if not data or 'preset_mission_id' not in data:
-        return jsonify({'error': 'preset_mission_id is required'}), 400
-
-    user_id = None
-    try:
-        verify_jwt_in_request(optional=True)
-        identity = get_jwt_identity()
-        if identity:
-            user_id = int(identity)
-    except:
-        pass
+    user_id = get_current_user_id()
 
     record = MissionRecord(
         user_id=user_id,
@@ -151,30 +130,27 @@ def fail_preset_mission():
         notes='failed'
     )
 
-    try:
-        db.session.add(record)
-        db.session.commit()
-        return jsonify({'message': 'Mission failed recorded', 'record': record.to_dict()}), 201
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({'error': str(e)}), 500
+    db.session.add(record)
+    db.session.commit()
+    return success_response(
+        {'record': record.to_dict()},
+        message='Mission failed recorded',
+        status=201
+    )
 
 
 @missions_bp.route('/medals', methods=['GET'])
 def get_earned_medals():
-    user_id = None
-    try:
-        verify_jwt_in_request(optional=True)
-        identity = get_jwt_identity()
-        if identity:
-            user_id = int(identity)
-    except:
-        pass
+    user_id = get_current_user_id()
 
-    query = MissionRecord.query.filter(MissionRecord.tier.isnot(None))
+    query = MissionRecord.query.filter(
+        MissionRecord.tier.isnot(None),
+        MissionRecord.actual_duration > 0  # 실패 기록 제외
+    )
 
     if user_id:
-        query = query.filter(MissionRecord.user_id == user_id)
+        # 로그인한 사용자: 본인 레코드 + user_id가 None인 레코드
+        query = query.filter((MissionRecord.user_id == user_id) | (MissionRecord.user_id.is_(None)))
 
     records = query.all()
 
@@ -183,32 +159,26 @@ def get_earned_medals():
         if record.tier in medals:
             medals[record.tier] += 1
 
-    return jsonify({'medals': medals}), 200
+    return success_response({'medals': medals})
 
 
 @missions_bp.route('/recent', methods=['GET'])
 def get_recent_completed_missions():
     limit = request.args.get('limit', 5, type=int)
+    user_id = get_current_user_id()
 
-    user_id = None
-    try:
-        verify_jwt_in_request(optional=True)
-        identity = get_jwt_identity()
-        if identity:
-            user_id = int(identity)
-    except:
-        pass
-
-    query = MissionRecord.query.filter(MissionRecord.preset_mission_id.isnot(None))
+    query = MissionRecord.query.filter(
+        MissionRecord.preset_mission_id.isnot(None),
+        MissionRecord.actual_duration > 0  # 실패 기록 제외
+    )
 
     if user_id:
-        query = query.filter(MissionRecord.user_id == user_id)
+        # 로그인한 사용자: 본인 레코드 + user_id가 None인 레코드
+        query = query.filter((MissionRecord.user_id == user_id) | (MissionRecord.user_id.is_(None)))
 
     records = query.order_by(MissionRecord.completed_at.desc()).limit(limit).all()
 
-    return jsonify({
-        'missions': [record.to_dict() for record in records]
-    }), 200
+    return success_response({'missions': [record.to_dict() for record in records]})
 
 
 @missions_bp.route('', methods=['POST'])

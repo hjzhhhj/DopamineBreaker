@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import DongMedal from "../assets/DongMedal.png";
 import EunMedal from "../assets/EunMedal.png";
 import GeumMedal from "../assets/GeumMedal.png";
@@ -188,7 +189,8 @@ const tierConfig = {
 
 function Home() {
   const navigate = useNavigate();
-  const [userName] = useState("사용자");
+  const { user } = useAuth();
+  const userName = user?.username || "사용자";
   const [currentDate, setCurrentDate] = useState("");
   const [usageData, setUsageData] = useState({
     categories: [],
