@@ -167,7 +167,7 @@ cp .env.example .env
 python init_data.py
 
 # 서버 실행
-python app.py
+python3 -m flask run --port 5001
 # 백엔드 서버가 http://localhost:5001 에서 실행됩니다
 ```
 

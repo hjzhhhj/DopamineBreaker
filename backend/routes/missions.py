@@ -180,6 +180,36 @@ def get_recent_completed_missions():
     return success_response({'missions': [record.to_dict() for record in records]})
 
 
+@missions_bp.route('/by-tier/<tier>', methods=['GET'])
+def get_missions_by_tier(tier):
+    """특정 티어의 완료한 미션 목록 조회"""
+    user_id = get_current_user_id()
+
+    # 유효한 티어인지 확인
+    if tier not in ['bronze', 'silver', 'gold']:
+        return jsonify({'error': 'Invalid tier. Must be bronze, silver, or gold'}), 400
+
+    query = MissionRecord.query.filter(
+        MissionRecord.tier == tier,
+        MissionRecord.preset_mission_id.isnot(None),  # 프리셋 미션만
+        MissionRecord.actual_duration > 0  # 실패 기록 제외
+    )
+
+    if user_id:
+        # 로그인한 사용자: 본인 레코드 + user_id가 None인 레코드
+        query = query.filter((MissionRecord.user_id == user_id) | (MissionRecord.user_id.is_(None)))
+
+    records = query.order_by(MissionRecord.completed_at.desc()).all()
+
+    # 디버깅용 로그
+    print(f"[DEBUG] Getting {tier} missions for user_id: {user_id}")
+    print(f"[DEBUG] Found {len(records)} records")
+    for r in records[:3]:  # 처음 3개만 출력
+        print(f"[DEBUG] Record: id={r.id}, tier={r.tier}, title={r.title}")
+
+    return success_response({'missions': [record.to_dict() for record in records]})
+
+
 @missions_bp.route('', methods=['POST'])
 def create_mission():
     data = request.get_json()

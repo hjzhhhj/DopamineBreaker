@@ -32,7 +32,7 @@ const LogoText = styled.h1`
   font-weight: 500;
   color: #3a6ea5;
   font-family: "Paperlogy";
-  margin-top: 24px;
+  margin-top: 32px;
 `;
 
 const ButtonSection = styled.div`

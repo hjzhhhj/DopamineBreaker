@@ -15,10 +15,11 @@ const MissionContainer = styled.div`
 
 const PageTitle = styled.h1`
   margin-top: 32px;
+  padding: 0 0 28px 0;
   font-size: 24px;
-  font-weight: 600;
-  color: #333333;
-  margin-bottom: 32px;
+  font-weight: 700;
+  color: #000000;
+  line-height: 1.4;
 `;
 
 const ToggleContainer = styled.div`
@@ -194,7 +195,6 @@ const SuccessButton = styled.button`
   }
 `;
 
-
 function Mission() {
   const location = useLocation();
   const [missions, setMissions] = useState([]);
@@ -299,7 +299,7 @@ function Mission() {
   return (
     <>
       <MissionContainer>
-        <PageTitle>오늘의 미션</PageTitle>
+        <PageTitle>미션</PageTitle>
 
         <ToggleContainer>
           {Object.entries(TIER_CONFIG).map(([tier, config]) => (

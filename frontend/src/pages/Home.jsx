@@ -13,15 +13,12 @@ const HomeContainer = styled.div`
   padding-bottom: 24px;
 `;
 
-const Header = styled.div`
+const PageTitle = styled.h1`
   margin-top: 32px;
-`;
-
-const Greeting = styled.h1`
+  padding: 0 0 28px 0;
   font-size: 24px;
   font-weight: 700;
   color: #000000;
-  margin-bottom: 28px;
   line-height: 1.4;
 `;
 
@@ -45,6 +42,7 @@ const ViewAllButton = styled.button`
   font-size: 28px;
   color: #333333;
   cursor: pointer;
+  padding-right: 8px;
 `;
 
 const Section = styled.section`
@@ -219,13 +217,11 @@ function Home() {
 
   return (
     <HomeContainer>
-      <Header>
-        <Greeting>
-          {userName}님<br />
-          잠시 쉬어가볼까요?
-        </Greeting>
-        <SectionTitle>{currentDate} 사용 내용</SectionTitle>
-      </Header>
+      <PageTitle>
+        {userName}님<br />
+        잠시 쉬어가볼까요?
+      </PageTitle>
+      <SectionTitle>{currentDate} 사용 내용</SectionTitle>
 
       <Section>
         <UsageCard>
@@ -253,7 +249,9 @@ function Home() {
 
       <Section>
         <SectionHeader>
-          <SectionTitle style={{ marginBottom: 0 }}>오늘의 미션</SectionTitle>
+          <SectionTitle style={{ marginBottom: 0, paddingLeft: "4px" }}>
+            오늘의 미션
+          </SectionTitle>
           <ViewAllButton onClick={() => navigate("/mission")}>
             {">"}
           </ViewAllButton>
