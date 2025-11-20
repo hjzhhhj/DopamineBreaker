@@ -281,16 +281,12 @@ function Profile() {
     navigate("/login");
   };
 
+  // 메달 클릭 시 해당 티어의 완료한 미션 목록을 모달로 표시
   const handleMedalClick = async (tier) => {
-    console.log(`[DEBUG] Clicking ${tier} medal`);
     setSelectedTier(tier);
     setIsLoadingTier(true);
     try {
       const missions = await missionApi.getByTier(tier);
-      console.log(
-        `[DEBUG] Received ${missions.length} missions for ${tier}:`,
-        missions
-      );
       setTierMissions(missions);
     } catch (error) {
       console.error(`${tier} 미션 불러오기 실패:`, error);
@@ -310,6 +306,7 @@ function Profile() {
 
     const fetchData = async () => {
       try {
+        // 메달 통계와 최근 미션을 병렬로 가져와 성능 최적화
         const [medalsData, recentData] = await Promise.all([
           missionApi.getMedals(),
           missionApi.getRecent(5),

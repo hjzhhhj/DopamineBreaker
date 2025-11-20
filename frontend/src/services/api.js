@@ -1,6 +1,5 @@
 import { API_BASE_URL } from "../constants";
 
-/* API 호출 헬퍼 함수 */
 const apiFetch = async (endpoint, options = {}) => {
   const url = `${API_BASE_URL}${endpoint}`;
   const response = await fetch(url, {
@@ -12,6 +11,7 @@ const apiFetch = async (endpoint, options = {}) => {
   });
 
   if (!response.ok) {
+    // JSON 파싱 실패 시 빈 객체로 fallback
     const error = await response.json().catch(() => ({}));
     throw new Error(error.message || `HTTP ${response.status}`);
   }
@@ -19,15 +19,13 @@ const apiFetch = async (endpoint, options = {}) => {
   return response.json();
 };
 
-/* 미션 관련 API */
 export const missionApi = {
-  /* 프리셋 미션 목록 조회 */
   getPresets: async () => {
     const data = await apiFetch("/missions/presets");
+    // API 응답 형식 정규화: 배열 또는 { missions: [] } 형식 모두 처리
     return Array.isArray(data) ? data : data.missions || [];
   },
 
-  /* 미션 완료 기록 */
   complete: async (mission) => {
     return apiFetch("/missions/presets/complete", {
       method: "POST",
@@ -41,7 +39,6 @@ export const missionApi = {
     });
   },
 
-  /* 미션 실패 기록 */
   fail: async (mission) => {
     return apiFetch("/missions/presets/fail", {
       method: "POST",
@@ -54,7 +51,6 @@ export const missionApi = {
     });
   },
 
-  /* 획득 메달 조회 */
   getMedals: async () => {
     const token = localStorage.getItem("token");
     return apiFetch("/missions/medals", {
@@ -62,7 +58,6 @@ export const missionApi = {
     });
   },
 
-  /* 최근 완료한 미션 조회 */
   getRecent: async (limit = 5) => {
     const token = localStorage.getItem("token");
     const data = await apiFetch(`/missions/recent?limit=${limit}`, {
@@ -71,7 +66,6 @@ export const missionApi = {
     return data.missions || [];
   },
 
-  /* 티어별 완료한 미션 조회 */
   getByTier: async (tier) => {
     const token = localStorage.getItem("token");
     const data = await apiFetch(`/missions/by-tier/${tier}`, {
@@ -81,8 +75,6 @@ export const missionApi = {
   },
 };
 
-/* 인증 관련 API (AuthContext에서 사용)
- */
 export const authApi = {
   login: async (username, password) => {
     return apiFetch("/auth/login", {

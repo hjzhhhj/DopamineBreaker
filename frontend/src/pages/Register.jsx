@@ -35,7 +35,7 @@ const RegisterScreen = () => {
   const handleRegister = async (event) => {
     event.preventDefault();
 
-    // 필드 검증
+    // 입력값 유효성 검사: 빈 값 및 비밀번호 일치 확인
     if (!email.trim()) {
       setEmailError("이메일을 입력해주세요.");
       return;

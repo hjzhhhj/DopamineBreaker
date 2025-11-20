@@ -133,6 +133,7 @@ function MissionTimer({ mission, onComplete, onCancel }) {
   const [showFocusAlert, setShowFocusAlert] = useState(false);
   const intervalRef = useRef(null);
   const alertTimeoutRef = useRef(null);
+  // visibility 이벤트 핸들러에서 stale closure 문제를 방지하기 위해 ref 사용
   const isPausedRef = useRef(false);
   const missionTitle = getMissionTitle(mission);
   const totalTime = mission.duration * 60;
@@ -141,7 +142,6 @@ function MissionTimer({ mission, onComplete, onCancel }) {
     requestNotificationPermission();
 
     const startTimer = () => {
-      // 기존 타이머가 있으면 먼저 정리
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
@@ -164,84 +164,55 @@ function MissionTimer({ mission, onComplete, onCancel }) {
       }, 1000);
     };
 
+    const clearAlertTimer = () => {
+      if (alertTimeoutRef.current) {
+        clearTimeout(alertTimeoutRef.current);
+        alertTimeoutRef.current = null;
+      }
+    };
+
+    // 탭 전환 감지: 사용자가 다른 탭으로 이동하면 타이머 일시정지, 돌아오면 재개
     const handleVisibilityChange = () => {
       if (document.hidden) {
-        // 백그라운드로 이동시
+        // 탭 이탈 시 타이머 일시정지
         setIsCompleted((currentCompleted) => {
           if (!currentCompleted) {
-            console.log("[DEBUG] 백그라운드 이동, 타이머 일시정지");
-
-            // 타이머 중지
             if (intervalRef.current) {
               clearInterval(intervalRef.current);
               intervalRef.current = null;
             }
             isPausedRef.current = true;
-
-            // 기존 알림 타이머가 있으면 취소
-            if (alertTimeoutRef.current) {
-              clearTimeout(alertTimeoutRef.current);
-              alertTimeoutRef.current = null;
-            }
+            clearAlertTimer();
           }
           return currentCompleted;
         });
-
-        // 알림 표시는 별도로 실행
         setShowFocusAlert(true);
       } else {
-        // 포그라운드로 복귀시
+        // 탭 복귀 시 타이머 재개 및 1.5초간 집중 알림 표시
         setIsCompleted((currentCompleted) => {
-          console.log(
-            "[DEBUG] 포그라운드 복귀, isPaused:",
-            isPausedRef.current,
-            "isCompleted:",
-            currentCompleted,
-            "hasAlertTimer:",
-            !!alertTimeoutRef.current
-          );
-
-          // 완료되지 않았고 일시정지 상태라면 타이머 재개
           if (!currentCompleted && isPausedRef.current) {
             isPausedRef.current = false;
-
-            // 기존 알림 타이머가 있으면 취소
-            if (alertTimeoutRef.current) {
-              clearTimeout(alertTimeoutRef.current);
-              alertTimeoutRef.current = null;
-            }
-
+            clearAlertTimer();
             startTimer();
 
-            // 알림은 1.5초 후에 숨김
             alertTimeoutRef.current = setTimeout(() => {
-              console.log("[DEBUG] 1.5초 후 알림 숨김 실행");
               setShowFocusAlert(false);
               alertTimeoutRef.current = null;
             }, 1500);
           } else if (alertTimeoutRef.current === null && !isPausedRef.current) {
-            // 알림 타이머가 설정되지 않았고 일시정지 상태가 아닌 경우에만 즉시 숨김
-            console.log("[DEBUG] 즉시 알림 숨김");
             setShowFocusAlert(false);
-          } else {
-            console.log("[DEBUG] 알림 타이머 이미 실행 중 또는 일시정지 상태, 무시");
           }
-
           return currentCompleted;
         });
       }
     };
 
     document.addEventListener("visibilitychange", handleVisibilityChange);
-
-    // 초기 타이머 시작
     startTimer();
 
     return () => {
       clearInterval(intervalRef.current);
-      if (alertTimeoutRef.current) {
-        clearTimeout(alertTimeoutRef.current);
-      }
+      clearAlertTimer();
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, [missionTitle]);
@@ -256,6 +227,7 @@ function MissionTimer({ mission, onComplete, onCancel }) {
     onCancel();
   };
 
+  // SVG 원형 프로그레스바 계산: 경과 시간에 따라 원의 둘레를 채워나감
   const progress = ((totalTime - timeLeft) / totalTime) * 100;
   const circumference = 2 * Math.PI * 130;
   const strokeDashoffset = circumference - (progress / 100) * circumference;
@@ -275,7 +247,6 @@ function MissionTimer({ mission, onComplete, onCancel }) {
               stroke="#e0e0e0"
               strokeWidth="20"
             />
-            {/* 진행 원 */}
             <circle
               cx="140"
               cy="140"

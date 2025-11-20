@@ -226,11 +226,11 @@ function Mission() {
     };
 
     fetchMissions();
+    // cleanup: 컴포넌트 언마운트 시 진행 중인 요청 취소
     return () => controller.abort();
   }, []);
 
   useEffect(() => {
-    // 홈에서 전달된 미션이 있으면 자동 시작
     if (location.state?.autoStartMission) {
       setActiveMission(location.state.autoStartMission);
     }
@@ -253,7 +253,7 @@ function Mission() {
       setShowSuccessModal(true);
     } catch (error) {
       console.error("미션 완료 처리 중 오류:", error);
-      // 오류가 발생해도 UI는 업데이트
+      // API 실패해도 성공 모달 표시 (사용자 경험 우선)
       setCompletedMission(activeMission);
       setActiveMission(null);
       setShowSuccessModal(true);

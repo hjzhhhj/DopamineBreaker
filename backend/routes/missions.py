@@ -24,6 +24,7 @@ def get_mission_presets_list():
 
     all_presets = daily_mission.to_mission_list()
 
+    # 오늘 완료한 프리셋 미션 목록을 조회하여 중복 수행 방지
     today_start = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
     completed_today = db.session.query(MissionRecord).filter(
         MissionRecord.preset_mission_id.isnot(None),
@@ -31,8 +32,6 @@ def get_mission_presets_list():
     ).all()
 
     completed_ids = {record.preset_mission_id for record in completed_today}
-
-    # 완료되지 않은 미션만 필터링
     available_presets = [m for m in all_presets if m['id'] not in completed_ids]
 
     return jsonify({'missions': available_presets}), 200
@@ -119,13 +118,14 @@ def fail_preset_mission():
     data = request.get_json()
     user_id = get_current_user_id()
 
+    # actual_duration=0, notes='failed'로 실패 기록 (완료한 미션과 구분)
     record = MissionRecord(
         user_id=user_id,
         preset_mission_id=data['preset_mission_id'],
         tier=data.get('tier'),
         title=data.get('title'),
         description=data.get('description'),
-        actual_duration=0,  # 실패는 0으로 표시
+        actual_duration=0,
         notes='failed'
     )
 
@@ -142,13 +142,14 @@ def fail_preset_mission():
 def get_earned_medals():
     user_id = get_current_user_id()
 
+    # 티어가 있고 실제 완료한 미션만 필터링 (실패 기록 제외)
     query = MissionRecord.query.filter(
         MissionRecord.tier.isnot(None),
-        MissionRecord.actual_duration > 0  # 실패 기록 제외
+        MissionRecord.actual_duration > 0
     )
 
     if user_id:
-        # 로그인한 사용자: 본인 레코드 + user_id가 None인 레코드
+        # 로그인 전 완료한 미션(user_id=None) + 로그인 후 본인 미션만 조회
         query = query.filter((MissionRecord.user_id == user_id) | (MissionRecord.user_id.is_(None)))
 
     records = query.all()
@@ -168,11 +169,11 @@ def get_recent_completed_missions():
 
     query = MissionRecord.query.filter(
         MissionRecord.preset_mission_id.isnot(None),
-        MissionRecord.actual_duration > 0  # 실패 기록 제외
+        MissionRecord.actual_duration > 0
     )
 
     if user_id:
-        # 로그인한 사용자: 본인 레코드 + user_id가 None인 레코드
+        # 로그인 전 완료한 미션(user_id=None) + 로그인 후 본인 미션만 조회
         query = query.filter((MissionRecord.user_id == user_id) | (MissionRecord.user_id.is_(None)))
 
     records = query.order_by(MissionRecord.completed_at.desc()).limit(limit).all()
@@ -185,27 +186,20 @@ def get_missions_by_tier(tier):
     """특정 티어의 완료한 미션 목록 조회"""
     user_id = get_current_user_id()
 
-    # 유효한 티어인지 확인
     if tier not in ['bronze', 'silver', 'gold']:
         return jsonify({'error': 'Invalid tier. Must be bronze, silver, or gold'}), 400
 
     query = MissionRecord.query.filter(
         MissionRecord.tier == tier,
-        MissionRecord.preset_mission_id.isnot(None),  # 프리셋 미션만
-        MissionRecord.actual_duration > 0  # 실패 기록 제외
+        MissionRecord.preset_mission_id.isnot(None),
+        MissionRecord.actual_duration > 0
     )
 
     if user_id:
-        # 로그인한 사용자: 본인 레코드 + user_id가 None인 레코드
+        # 로그인 전 완료한 미션(user_id=None) + 로그인 후 본인 미션만 조회
         query = query.filter((MissionRecord.user_id == user_id) | (MissionRecord.user_id.is_(None)))
 
     records = query.order_by(MissionRecord.completed_at.desc()).all()
-
-    # 디버깅용 로그
-    print(f"[DEBUG] Getting {tier} missions for user_id: {user_id}")
-    print(f"[DEBUG] Found {len(records)} records")
-    for r in records[:3]:  # 처음 3개만 출력
-        print(f"[DEBUG] Record: id={r.id}, tier={r.tier}, title={r.title}")
 
     return success_response({'missions': [record.to_dict() for record in records]})
 
