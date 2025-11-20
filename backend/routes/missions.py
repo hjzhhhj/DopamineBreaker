@@ -3,7 +3,6 @@ from datetime import datetime
 from database import db
 from models.mission import Mission, MissionRecord
 from models.daily_mission import DailyMission
-from utils.mission_presets import get_mission_presets
 from utils.auth_helpers import get_current_user_id
 from utils.error_handlers import handle_db_errors, validate_json_payload, success_response, error_response
 
