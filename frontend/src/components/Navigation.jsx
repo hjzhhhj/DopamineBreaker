@@ -1,5 +1,6 @@
 import { NavLink } from "react-router-dom";
 import styled from "styled-components";
+import { motion } from "framer-motion";
 import HomeIcon from "./icons/HomeIcon";
 import MissionIcon from "./icons/MissionIcon";
 import ProfileIcon from "./icons/ProfileIcon";
@@ -30,7 +31,7 @@ const StyledNavLink = styled(NavLink)`
   justify-content: center;
   padding: 8px;
   color: #757575;
-  transition: all 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
   text-decoration: none;
 
   &.active {
@@ -42,14 +43,14 @@ const StyledNavLink = styled(NavLink)`
   }
 
   &:active {
-    transform: scale(0.95);
+    transform: scale(0.92);
   }
 `;
 
-const NavIcon = styled.div`
+const NavIcon = styled(motion.div)`
   font-size: 1.5rem;
   margin-bottom: 4px;
-  transition: transform 0.15s ease;
+  transition: transform 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
 `;
 
 const NavLabel = styled.span`

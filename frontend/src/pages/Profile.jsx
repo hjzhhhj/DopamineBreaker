@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import { motion, AnimatePresence } from "framer-motion";
+import PageTransition from "../components/PageTransition";
 import { useAuth } from "../context/AuthContext";
 import ProfileImg from "../assets/Profile.png";
 import { TIER_CONFIG } from "../constants";
@@ -83,17 +85,17 @@ const MedalGrid = styled.div`
   gap: 12px;
 `;
 
-const MedalCard = styled.div`
+const MedalCard = styled(motion.div)`
   display: flex;
   align-items: center;
   gap: 16px;
   padding: 8px 0px;
   border-radius: 12px;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
 
   &:active {
-    transform: scale(0.98);
+    transform: scale(0.96);
   }
 `;
 
@@ -171,7 +173,7 @@ const MissionDescription = styled.p`
   color: #757575;
 `;
 
-const LogoutButton = styled.button`
+const LogoutButton = styled(motion.button)`
   width: 100%;
   margin-top: 32px;
   padding: 16px;
@@ -182,14 +184,14 @@ const LogoutButton = styled.button`
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
 
   &:hover {
     background-color: #eeeeee;
   }
 
   &:active {
-    transform: scale(0.98);
+    transform: scale(0.96);
     background-color: #e0e0e0;
   }
 `;
@@ -207,7 +209,7 @@ const ModalOverlay = styled.div`
   z-index: 1000;
 `;
 
-const ModalContainer = styled.div`
+const ModalContainer = styled(motion.div)`
   background-color: #ffffff;
   border-radius: 16px;
   max-width: 432px;
@@ -234,7 +236,7 @@ const ModalTitle = styled.h2`
   gap: 12px;
 `;
 
-const CloseButton = styled.button`
+const CloseButton = styled(motion.button)`
   font-size: 28px;
   color: #757575;
   cursor: pointer;
@@ -242,9 +244,14 @@ const CloseButton = styled.button`
   border: none;
   padding: 0;
   line-height: 1;
+  transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
 
   &:hover {
     color: #333333;
+  }
+
+  &:active {
+    transform: scale(0.9);
   }
 `;
 
@@ -324,7 +331,8 @@ function Profile() {
   }, [user]);
 
   return (
-    <ProfileContainer>
+    <PageTransition>
+      <ProfileContainer>
       <PageTitle>프로필</PageTitle>
       <ProfileHeader>
         <Avatar src={ProfileImg} alt="프로필" />
@@ -340,7 +348,11 @@ function Profile() {
             {Object.entries(TIER_CONFIG)
               .filter(([tier]) => tier !== "all")
               .map(([tier, config]) => (
-                <MedalCard key={tier} onClick={() => handleMedalClick(tier)}>
+                <MedalCard
+                  key={tier}
+                  onClick={() => handleMedalClick(tier)}
+                  whileTap={{ scale: 0.96 }}
+                >
                   <MedalImageIcon src={config.medal} alt={config.label} />
                   <MedalTextInfo>
                     <MedalCount>{medalStats[tier]}개의</MedalCount>
@@ -382,18 +394,35 @@ function Profile() {
             )}
           </MissionList>
         </RecentMissions>
-        <LogoutButton onClick={handleLogout}>로그아웃</LogoutButton>
+        <LogoutButton
+          onClick={handleLogout}
+          whileTap={{ scale: 0.96 }}
+        >
+          로그아웃
+        </LogoutButton>
       </Section>
 
-      {selectedTier && (
-        <ModalOverlay onClick={handleCloseModal}>
-          <ModalContainer onClick={(e) => e.stopPropagation()}>
-            <ModalHeader>
-              <ModalTitle>
-                {TIER_CONFIG[selectedTier]?.label} 메달 미션
-              </ModalTitle>
-              <CloseButton onClick={handleCloseModal}>×</CloseButton>
-            </ModalHeader>
+      <AnimatePresence>
+        {selectedTier && (
+          <ModalOverlay onClick={handleCloseModal}>
+            <ModalContainer
+              onClick={(e) => e.stopPropagation()}
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
+            >
+              <ModalHeader>
+                <ModalTitle>
+                  {TIER_CONFIG[selectedTier]?.label} 메달 미션
+                </ModalTitle>
+                <CloseButton
+                  onClick={handleCloseModal}
+                  whileTap={{ scale: 0.9 }}
+                >
+                  ×
+                </CloseButton>
+              </ModalHeader>
 
             {isLoadingTier ? (
               <EmptyMessage>미션을 불러오는 중...</EmptyMessage>
@@ -423,9 +452,11 @@ function Profile() {
               </EmptyMessage>
             )}
           </ModalContainer>
-        </ModalOverlay>
-      )}
+          </ModalOverlay>
+        )}
+      </AnimatePresence>
     </ProfileContainer>
+    </PageTransition>
   );
 }
 

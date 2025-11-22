@@ -1,4 +1,5 @@
-import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { Routes, Route, Navigate, Outlet, useLocation } from 'react-router-dom';
+import { AnimatePresence } from 'framer-motion';
 import GlobalStyle from './styles/GlobalStyle';
 import Layout from './components/Layout';
 import Home from './pages/Home';
@@ -22,21 +23,24 @@ const ProtectedRoutes = () => {
 
 const AppRoutes = () => {
   const { user } = useAuth();
+  const location = useLocation();
 
   return (
-    <Routes>
-      <Route path="/welcome" element={user ? <Navigate to="/" /> : <Welcome />} />
-      <Route path="/login" element={user ? <Navigate to="/" /> : <Login />} />
-      <Route path="/register" element={user ? <Navigate to="/" /> : <Register />} />
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route path="/welcome" element={user ? <Navigate to="/" /> : <Welcome />} />
+        <Route path="/login" element={user ? <Navigate to="/" /> : <Login />} />
+        <Route path="/register" element={user ? <Navigate to="/" /> : <Register />} />
 
-      <Route element={<ProtectedRoutes />}>
-        <Route path="/" element={<Home />} />
-        <Route path="/mission" element={<Mission />} />
-        <Route path="/profile" element={<Profile />} />
-      </Route>
+        <Route element={<ProtectedRoutes />}>
+          <Route path="/" element={<Home />} />
+          <Route path="/mission" element={<Mission />} />
+          <Route path="/profile" element={<Profile />} />
+        </Route>
 
-      <Route path="*" element={user ? <Navigate to="/" /> : <Navigate to="/welcome" />} />
-    </Routes>
+        <Route path="*" element={user ? <Navigate to="/" /> : <Navigate to="/welcome" />} />
+      </Routes>
+    </AnimatePresence>
   );
 };
 

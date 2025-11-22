@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import PageTransition from "../components/PageTransition";
 import { useAuth } from "../context/AuthContext";
 import { TIER_CONFIG } from "../constants";
 import { formatTime } from "../utils/helpers";
@@ -36,13 +38,18 @@ const SectionHeader = styled.div`
   margin-bottom: 16px;
 `;
 
-const ViewAllButton = styled.button`
+const ViewAllButton = styled(motion.button)`
   font-family: "Font Awesome 5 Pro";
   font-weight: 500;
   font-size: 28px;
   color: #333333;
   cursor: pointer;
   padding-right: 8px;
+  transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+
+  &:active {
+    transform: scale(0.9);
+  }
 `;
 
 const Section = styled.section`
@@ -120,15 +127,15 @@ const MissionGrid = styled.div`
   max-width: 480px;
 `;
 
-const MissionCardSmall = styled.div`
+const MissionCardSmall = styled(motion.div)`
   background-color: #ffffff;
   border-radius: 12px;
   padding: 24px;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
 
   &:active {
-    transform: scale(0.98);
+    transform: scale(0.96);
   }
 `;
 
@@ -216,11 +223,12 @@ function Home() {
   };
 
   return (
-    <HomeContainer>
-      <PageTitle>
-        {userName}님<br />
-        잠시 쉬어가볼까요?
-      </PageTitle>
+    <PageTransition>
+      <HomeContainer>
+        <PageTitle>
+          {userName}님<br />
+          잠시 쉬어가볼까요?
+        </PageTitle>
       <SectionTitle>{currentDate} 사용 내용</SectionTitle>
 
       <Section>
@@ -252,7 +260,10 @@ function Home() {
           <SectionTitle style={{ marginBottom: 0, paddingLeft: "4px" }}>
             오늘의 미션
           </SectionTitle>
-          <ViewAllButton onClick={() => navigate("/mission")}>
+          <ViewAllButton
+            onClick={() => navigate("/mission")}
+            whileTap={{ scale: 0.9 }}
+          >
             {">"}
           </ViewAllButton>
         </SectionHeader>
@@ -263,6 +274,7 @@ function Home() {
               <MissionCardSmall
                 key={mission.id}
                 onClick={() => handleMissionClick(mission)}
+                whileTap={{ scale: 0.96 }}
               >
                 <MissionHeader>
                   <MissionTitleSection>
@@ -287,6 +299,7 @@ function Home() {
         </MissionGrid>
       </Section>
     </HomeContainer>
+    </PageTransition>
   );
 }
 

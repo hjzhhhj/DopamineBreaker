@@ -6,6 +6,7 @@ const GlobalStyle = createGlobalStyle`
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
   }
 
   html, body {
@@ -16,6 +17,7 @@ const GlobalStyle = createGlobalStyle`
     background-color: #F3F3F3;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
   }
 
   #root {
@@ -35,6 +37,8 @@ const GlobalStyle = createGlobalStyle`
     border: none;
     background: none;
     outline: none;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
   }
 
   input, textarea {

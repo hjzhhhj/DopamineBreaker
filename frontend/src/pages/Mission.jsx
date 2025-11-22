@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import styled from "styled-components";
+import { motion, AnimatePresence } from "framer-motion";
+import PageTransition from "../components/PageTransition";
 import MissionTimer from "../components/MissionTimer";
 import MisionSuccess from "../assets/MisionSuccess.png";
 import { TIER_CONFIG } from "../constants";
@@ -29,18 +31,22 @@ const ToggleContainer = styled.div`
   margin-bottom: 16px;
 `;
 
-const ToggleButton = styled.button`
+const ToggleButton = styled(motion.button)`
   flex: 1;
   padding: 12px;
   border-radius: 20px;
   font-weight: 600;
   font-size: 14px;
-  transition: all 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
   background-color: ${(props) => (props.$active ? "#FFFFFF" : "transparent")};
   color: ${(props) => (props.$active ? "#000000" : "#757575")};
 
   &:hover {
     opacity: 0.8;
+  }
+
+  &:active {
+    transform: scale(0.95);
   }
 `;
 
@@ -51,15 +57,15 @@ const MissionList = styled.div`
   border-radius: 16px;
 `;
 
-const MissionCard = styled.div`
+const MissionCard = styled(motion.div)`
   background-color: #ffffff;
   border-radius: 12px;
   padding: 24px;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
 
   &:active {
-    transform: scale(0.98);
+    transform: scale(0.96);
   }
 `;
 
@@ -132,7 +138,7 @@ const SuccessOverlay = styled.div`
   z-index: 1000;
 `;
 
-const SuccessModal = styled.div`
+const SuccessModal = styled(motion.div)`
   background-color: #ffffff;
   border-radius: 24px;
   padding: 48px;
@@ -140,18 +146,6 @@ const SuccessModal = styled.div`
   max-width: 400px;
   margin: 0 16px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  animation: slideUp 0.3s ease-out;
-
-  @keyframes slideUp {
-    from {
-      transform: translateY(50px);
-      opacity: 0;
-    }
-    to {
-      transform: translateY(0);
-      opacity: 1;
-    }
-  }
 `;
 
 const SuccessImage = styled.img`
@@ -176,22 +170,21 @@ const SuccessMessage = styled.p`
   margin-bottom: 32px;
 `;
 
-const SuccessButton = styled.button`
+const SuccessButton = styled(motion.button)`
   background-color: #3a6ea5;
   color: white;
   padding: 16px 48px;
   border-radius: 12px;
   font-size: 18px;
   font-weight: 600;
-  transition: all 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
 
   &:hover {
     background-color: #205185;
   }
 
   &:active {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(108, 99, 255, 0.3);
+    transform: scale(0.96);
   }
 `;
 
@@ -297,7 +290,7 @@ function Mission() {
   }
 
   return (
-    <>
+    <PageTransition>
       <MissionContainer>
         <PageTitle>미션</PageTitle>
 
@@ -307,6 +300,7 @@ function Mission() {
               key={tier}
               $active={selectedTier === tier}
               onClick={() => setSelectedTier(tier)}
+              whileTap={{ scale: 0.95 }}
             >
               {config.label}
             </ToggleButton>
@@ -326,6 +320,7 @@ function Mission() {
                   <MissionCard
                     key={mission.id}
                     onClick={() => handleStartMission(mission)}
+                    whileTap={{ scale: 0.96 }}
                   >
                     <MissionHeader>
                       <MissionTitleSection>
@@ -358,24 +353,35 @@ function Mission() {
         )}
       </MissionContainer>
 
-      {showSuccessModal && completedMission && (
-        <SuccessOverlay onClick={handleCloseSuccessModal}>
-          <SuccessModal onClick={(e) => e.stopPropagation()}>
-            <SuccessImage src={MisionSuccess} alt="미션 성공" />
-            <SuccessTitle>미션 완료!</SuccessTitle>
-            <SuccessMessage>
-              {getMissionTitle(completedMission)} 미션을 성공적으로
-              완료했습니다!
-              <br />
-              {completedMission.duration}분 동안 집중하셨네요!
-            </SuccessMessage>
-            <SuccessButton onClick={handleCloseSuccessModal}>
-              확인
-            </SuccessButton>
-          </SuccessModal>
-        </SuccessOverlay>
-      )}
-    </>
+      <AnimatePresence>
+        {showSuccessModal && completedMission && (
+          <SuccessOverlay onClick={handleCloseSuccessModal}>
+            <SuccessModal
+              onClick={(e) => e.stopPropagation()}
+              initial={{ scale: 0.8, opacity: 0, y: 50 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.8, opacity: 0, y: 50 }}
+              transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+            >
+              <SuccessImage src={MisionSuccess} alt="미션 성공" />
+              <SuccessTitle>미션 완료!</SuccessTitle>
+              <SuccessMessage>
+                {getMissionTitle(completedMission)} 미션을 성공적으로
+                완료했습니다!
+                <br />
+                {completedMission.duration}분 동안 집중하셨네요!
+              </SuccessMessage>
+              <SuccessButton
+                onClick={handleCloseSuccessModal}
+                whileTap={{ scale: 0.96 }}
+              >
+                확인
+              </SuccessButton>
+            </SuccessModal>
+          </SuccessOverlay>
+        )}
+      </AnimatePresence>
+    </PageTransition>
   );
 }
 

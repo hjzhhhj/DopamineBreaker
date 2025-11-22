@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import { motion } from "framer-motion";
 import { IoEye, IoEyeOff } from "react-icons/io5";
+import PageTransition from "../components/PageTransition";
 import logo from "../assets/logo.png";
 import { useAuth } from "../context/AuthContext";
 
@@ -75,7 +77,8 @@ const LoginScreen = () => {
   const submitLabel = isSubmitting ? "로그인 중..." : "로그인";
 
   return (
-    <Container>
+    <PageTransition>
+      <Container>
       <Card onSubmit={handleLogin}>
         <Content>
           <StepArea>
@@ -119,18 +122,27 @@ const LoginScreen = () => {
         </Content>
 
         <ButtonGroup>
-          <PrimaryButton type="submit" disabled={!isFormValid || isSubmitting}>
+          <PrimaryButton
+            type="submit"
+            disabled={!isFormValid || isSubmitting}
+            whileTap={!isFormValid || isSubmitting ? {} : { scale: 0.98 }}
+          >
             {submitLabel}
           </PrimaryButton>
           <LoginPrompt>
             <PromptText>아직 계정이 없으신가요?</PromptText>
-            <TextButton type="button" onClick={handleSignUpPress}>
+            <TextButton
+              type="button"
+              onClick={handleSignUpPress}
+              whileTap={{ scale: 0.95 }}
+            >
               회원가입
             </TextButton>
           </LoginPrompt>
         </ButtonGroup>
       </Card>
     </Container>
+    </PageTransition>
   );
 };
 
@@ -264,7 +276,7 @@ const ButtonGroup = styled.div`
   margin-bottom: 4px;
 `;
 
-const PrimaryButton = styled.button`
+const PrimaryButton = styled(motion.button)`
   width: 340px;
   padding: 15px;
   background-color: ${({ disabled }) => (disabled ? "#87a8cb" : "#3a6ea5")};
@@ -274,14 +286,14 @@ const PrimaryButton = styled.button`
   border: none;
   border-radius: 16px;
   cursor: ${({ disabled }) => (disabled ? "not-allowed" : "pointer")};
-  transition: background-color 0.2s ease, transform 0.2s ease;
+  transition: background-color 0.2s cubic-bezier(0.25, 0.1, 0.25, 1), transform 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
 
   &:hover {
     background-color: ${({ disabled }) => (disabled ? "#87a8cb" : "#205185")};
   }
 
   &:active {
-    transform: ${({ disabled }) => (disabled ? "none" : "translateY(1px)")};
+    transform: ${({ disabled }) => (disabled ? "none" : "scale(0.98)")};
   }
 `;
 
@@ -298,7 +310,7 @@ const PromptText = styled.span`
   color: #666666;
 `;
 
-const TextButton = styled.button`
+const TextButton = styled(motion.button)`
   border: none;
   background: none;
   color: #3a6ea5;
@@ -307,6 +319,11 @@ const TextButton = styled.button`
   text-decoration: underline;
   cursor: pointer;
   padding: 0;
+  transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+
+  &:active {
+    transform: scale(0.95);
+  }
 `;
 
 export default LoginScreen;

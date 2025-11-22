@@ -1,5 +1,7 @@
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import PageTransition from "../components/PageTransition";
 import logo from "../assets/logo.png";
 
 const Container = styled.div`
@@ -45,7 +47,7 @@ const ButtonSection = styled.div`
   gap: 20px;
 `;
 
-const PrimaryButton = styled.button`
+const PrimaryButton = styled(motion.button)`
   width: 100%;
   background-color: #3a6ea5;
   color: #ffffff;
@@ -55,10 +57,14 @@ const PrimaryButton = styled.button`
   border: none;
   border-radius: 16px;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: background-color 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
 
   &:hover {
     background-color: #205185;
+  }
+
+  &:active {
+    transform: scale(0.98);
   }
 `;
 
@@ -76,7 +82,7 @@ const LoginText = styled.span`
   color: #666666;
 `;
 
-const LoginLink = styled.button`
+const LoginLink = styled(motion.button)`
   background: none;
   border: none;
   color: #3a6ea5;
@@ -85,6 +91,11 @@ const LoginLink = styled.button`
   text-decoration: underline;
   cursor: pointer;
   padding: 0;
+  transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+
+  &:active {
+    transform: scale(0.95);
+  }
 `;
 
 const Welcome = () => {
@@ -99,23 +110,33 @@ const Welcome = () => {
   };
 
   return (
-    <Container>
-      <LogoContainer>
+    <PageTransition>
+      <Container>
+        <LogoContainer>
         <Logo src={logo} alt="DopamineBreaker" />
         <LogoText>오늘의 도파민을 관리해볼까요?</LogoText>
       </LogoContainer>
       <ButtonSection>
-        <PrimaryButton type="button" onClick={handleSignUp}>
+        <PrimaryButton
+          type="button"
+          onClick={handleSignUp}
+          whileTap={{ scale: 0.98 }}
+        >
           시작하기
         </PrimaryButton>
         <LoginContainer>
           <LoginText>만약 계정이 있다면?</LoginText>
-          <LoginLink type="button" onClick={handleLogin}>
+          <LoginLink
+            type="button"
+            onClick={handleLogin}
+            whileTap={{ scale: 0.95 }}
+          >
             로그인하기
           </LoginLink>
         </LoginContainer>
       </ButtonSection>
     </Container>
+    </PageTransition>
   );
 };
 
