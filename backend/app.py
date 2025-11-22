@@ -80,6 +80,24 @@ def create_app(config_class=DevelopmentConfig):
     scheduler.start()
     atexit.register(lambda: scheduler.shutdown())
 
+    # 앱 시작 시 데이터베이스 테이블 생성 및 오늘의 미션 확인
+    with app.app_context():
+        db.create_all()
+
+        from services.ai_mission_generator import generate_and_save_daily_missions
+        from models.daily_mission import DailyMission
+        from datetime import datetime
+
+        today = datetime.now().date()
+        existing_mission = DailyMission.query.filter_by(date=today).first()
+        if not existing_mission:
+            app.logger.info("오늘 미션이 없습니다. 즉시 생성합니다.")
+            try:
+                generate_and_save_daily_missions()
+                app.logger.info("오늘의 미션이 성공적으로 생성되었습니다.")
+            except Exception as e:
+                app.logger.error(f"미션 생성 중 오류 발생: {e}")
+
     return app
 
 if __name__ == '__main__':
